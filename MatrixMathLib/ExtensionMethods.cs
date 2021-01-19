@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace MatrixMathLib
 {
@@ -40,14 +38,10 @@ namespace MatrixMathLib
                     continue;
                 }
 
-                if (currentNode.Previous==null)
-                {
+                if (currentNode.Previous == null)
                     list.AddFirst(element);
-                }
                 else
-                {
                     list.AddAfter(currentNode.Previous!, element);
-                }
                 list.Remove(currentNode);
                 return currentNode;
             }
@@ -55,20 +49,9 @@ namespace MatrixMathLib
             throw new IndexOutOfRangeException();
         }
 
-        public static MemoryStream SerializeToStream(object obj)
-        {
-            var stream = new MemoryStream();
-            IFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(stream, obj);
-            return stream;
-        }
+        public static string SerializeToStream<T>(T obj)=> JsonConvert.SerializeObject(obj);
 
-        public static object DeserializeFromStream(MemoryStream stream)
-        {
-            IFormatter formatter = new BinaryFormatter();
-            stream.Seek(0, SeekOrigin.Begin);
-            var obj = formatter.Deserialize(stream);
-            return obj;
-        }
+        public static T DeserializeFromStream<T>(string stream)=> JsonConvert.DeserializeObject<T>(stream);
+
     }
 }

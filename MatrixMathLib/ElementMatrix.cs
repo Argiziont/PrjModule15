@@ -9,13 +9,11 @@ namespace MatrixMathLib
     {
         public LinkedList<LinkedList<int>> Matrix;
 
-        public int Rows { get; private set; }
-        public int Columns { get; private set; }
         public ElementMatrix()
         {
             Matrix = new LinkedList<LinkedList<int>>();
-
         }
+
         public ElementMatrix(LinkedList<LinkedList<int>> matrix)
         {
             Matrix = matrix;
@@ -23,10 +21,9 @@ namespace MatrixMathLib
             Rows = matrix.Count;
             if (matrix.Last != null) Columns = matrix.Last.Value.Count;
             else
-            {
                 throw new ArgumentNullException(nameof(matrix.Last));
-            }
         }
+
         public ElementMatrix(int rows, int columns)
         {
             Matrix = new LinkedList<LinkedList<int>>();
@@ -34,15 +31,37 @@ namespace MatrixMathLib
             {
                 var subMatrix = new LinkedList<int>();
 
-                for (var j = 0; j < columns; j++)
-                {
-                    subMatrix.AddLast(0);
-                }
+                for (var j = 0; j < columns; j++) subMatrix.AddLast(0);
                 Matrix.AddLast(subMatrix);
             }
 
             Rows = rows;
             Columns = columns;
+        }
+
+        public int Rows { get; set; }
+        public int Columns { get; set; }
+
+        public int this[int row, int column]
+        {
+            get => Matrix.ElementAt(row).ElementAt(column);
+            set
+            {
+                var currentNode = Matrix.First;
+                for (var i = 0; i <= row && currentNode != null; i++)
+                {
+                    if (i != row)
+                    {
+                        currentNode = currentNode.Next;
+                        continue;
+                    }
+
+                    currentNode.Value.ChangeAt(column, value);
+                    return;
+                }
+
+                throw new IndexOutOfRangeException();
+            }
         }
 
         public void Remove(int row, int column)
@@ -69,10 +88,7 @@ namespace MatrixMathLib
             {
                 var subMatrix = new LinkedList<int>();
 
-                for (var j = 0; j < Columns; j++)
-                {
-                    subMatrix.AddLast(0);
-                }
+                for (var j = 0; j < Columns; j++) subMatrix.AddLast(0);
                 Matrix.AddLast(subMatrix);
             }
 
@@ -84,11 +100,7 @@ namespace MatrixMathLib
             var currentNode = Matrix.First;
             for (var i = 0; i <= Rows && currentNode != null; i++)
             {
-                for (var j = 0; j < columnsCount; j++)
-                {
-
-                    currentNode.Value.AddLast(0);
-                }
+                for (var j = 0; j < columnsCount; j++) currentNode.Value.AddLast(0);
 
                 currentNode = currentNode.Next;
             }
@@ -96,29 +108,10 @@ namespace MatrixMathLib
             Columns += columnsCount;
         }
 
-        public int this[int row, int column]
+        public LinkedList<LinkedList<int>> GetMatrix()
         {
-            get => Matrix.ElementAt(row).ElementAt(column);
-            set
-            {
-                var currentNode = Matrix.First;
-                for (var i = 0; i <= row && currentNode != null; i++)
-                {
-                    if (i != row)
-                    {
-                        currentNode = currentNode.Next;
-                        continue;
-                    }
-
-                    currentNode.Value.ChangeAt(column, value);
-                    return;
-                }
-
-                throw new IndexOutOfRangeException();
-            }
+            return Matrix;
         }
-
-        public LinkedList<LinkedList<int>> GetMatrix() => Matrix;
 
         public int GetSum()
         {
@@ -132,11 +125,13 @@ namespace MatrixMathLib
                     sum += currentColumnNode.Value;
                     currentColumnNode = currentColumnNode.Next;
                 }
+
                 currentRowNode = currentRowNode.Next;
             }
 
             return sum;
         }
+
         public int GetProduct()
         {
             var product = 1;
@@ -149,11 +144,13 @@ namespace MatrixMathLib
                     product *= currentColumnNode.Value;
                     currentColumnNode = currentColumnNode.Next;
                 }
+
                 currentRowNode = currentRowNode.Next;
             }
 
             return product;
         }
+
         public ElementMatrix AddMatrix(ElementMatrix matrix)
         {
             if (matrix == null) throw new ArgumentNullException(nameof(matrix));
@@ -163,13 +160,8 @@ namespace MatrixMathLib
             var resultMatrix = new ElementMatrix(Rows, Columns);
 
             for (var i = 0; i < Rows; i++)
-            {
-                for (var j = 0; j < Columns; j++)
-                {
-
-                    resultMatrix[i, j]=this[i,j] + matrix[i, j];
-                }
-            }
+            for (var j = 0; j < Columns; j++)
+                resultMatrix[i, j] = this[i, j] + matrix[i, j];
             return resultMatrix;
         }
 
@@ -182,13 +174,8 @@ namespace MatrixMathLib
             var resultMatrix = new ElementMatrix(Rows, Columns);
 
             for (var i = 0; i < Rows; i++)
-            {
-                for (var j = 0; j < Columns; j++)
-                {
-
-                    resultMatrix[i, j] = this[i, j] - matrix[i, j];
-                }
-            }
+            for (var j = 0; j < Columns; j++)
+                resultMatrix[i, j] = this[i, j] - matrix[i, j];
             return resultMatrix;
         }
 

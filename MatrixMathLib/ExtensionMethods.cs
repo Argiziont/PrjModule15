@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using Newtonsoft.Json;
 
 namespace MatrixMathLib
@@ -49,9 +46,14 @@ namespace MatrixMathLib
             throw new IndexOutOfRangeException();
         }
 
-        public static string SerializeToStream<T>(T obj)=> JsonConvert.SerializeObject(obj);
+        public static string SerializeToStream<T>(T obj)
+        {
+            return JsonConvert.SerializeObject(obj);
+        }
 
-        public static T DeserializeFromStream<T>(string stream)=> JsonConvert.DeserializeObject<T>(stream);
-
+        public static T DeserializeFromStream<T>(string stream)
+        {
+            return JsonConvert.DeserializeObject<T>(stream);
+        }
     }
 }

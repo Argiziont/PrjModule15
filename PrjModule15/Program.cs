@@ -1,48 +1,47 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using MatrixMathLib;
-using static System.Text.Encoding;
 using static MatrixMathLib.ExtensionMethods;
+using static System.Text.Encoding;
+using Convert = System.Convert;
 
 
 namespace PrjModule15
 {
-    internal class Program
+    internal static class Program
     {
         private static void Main()
         {
+            var matrix = new ElementMatrix();
+
+            using var consoleStream = new MemoryStream();
+            using var consoleWriter = new BinaryWriter(consoleStream);
+
             Console.Write("Enter rows number: ");
-            var rows = System.Convert.ToInt32(Console.ReadLine());
+            var rows = Convert.ToInt32(Console.ReadLine());
             Console.Write("Enter columns number: ");
-            var cols = System.Convert.ToInt32(Console.ReadLine());
-            var matrix = new ElementMatrix(rows, cols);
+            var cols = Convert.ToInt32(Console.ReadLine());
+
+            consoleWriter.Write(rows);
+            consoleWriter.Write(cols);
 
             for (var i = 0; i < rows; i++)
-                for (var j = 0; j < cols; j++)
-                {
-                    Console.Write($"Write value of element [{i},{j}]: ");
-                    var value = System.Convert.ToInt32(Console.ReadLine());
-                    if (value > 0)
-                        matrix[i, j] = value;
-                    else
-                        Console.WriteLine($"Element {value} is negative and won't be proceed");
-                }
+            for (var j = 0; j < cols; j++)
+            {
+                Console.Write($"Write value of element [{i},{j}]: ");
+                consoleWriter.Write(Convert.ToInt32(Console.ReadLine()));
+            }
 
+            StreamMatrixCreator.CreateMatrix(consoleStream, matrix);
 
             //Our Serialized Json
             var output = SerializeToStream(matrix);
 
-            //Standard Input Processing Obsolete
-            //var inputStream = Console.OpenStandardInput();
-            //var bytes = new byte[json.Length];
-
-            //inputStream.Write(bytes, 0, json.Length);
-
-            //var chars = UTF8.GetChars(bytes, 0, json.Length);
-
             var bytesOut = UTF8.GetBytes(output.ToCharArray(), 0, output.Length);
 
             //Standard Output Processing
-            if (System.Console.OpenStandardOutput().BeginWrite(bytesOut, 0,
+            if (Console.OpenStandardOutput().BeginWrite(bytesOut, 0,
                 output.Length, null, null).AsyncWaitHandle.WaitOne())
             {
             }
@@ -50,6 +49,25 @@ namespace PrjModule15
             //Deserializing
             var deserializedProduct = DeserializeFromStream<ElementMatrix>(output);
             Console.WriteLine($"\nRows count {deserializedProduct.Rows}");
+
+            using var stream = new MemoryStream();
+            using var resultStream = new BinaryWriter(stream);
+
+            deserializedProduct.GetMemoryStream(resultStream, out _);
+
+            var intList = new List<int>();
+
+            stream.Position = 0;
+
+            using var reader = new BinaryReader(stream);
+            for (var i = 0; i < deserializedProduct.Columns * deserializedProduct.Rows; i++)
+                intList.Add(reader.ReadInt32());
+            Console.WriteLine("\nRestored matrix");
+            for (var i = 0; i < matrix.Rows; i++)
+            {
+                for (var j = 0; j < matrix.Columns; j++) Console.Write(intList[i * matrix.Columns + j] + "   ");
+                Console.WriteLine();
+            }
         }
     }
 }

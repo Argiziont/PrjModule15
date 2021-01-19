@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace MatrixMathLib
@@ -15,7 +11,8 @@ namespace MatrixMathLib
             return typeof(MemoryStream).IsAssignableFrom(objectType);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
             var bytes = serializer.Deserialize<byte[]>(reader);
             return bytes != null ? new MemoryStream(bytes) : new MemoryStream();
@@ -23,7 +20,7 @@ namespace MatrixMathLib
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var bytes = ((MemoryStream)value).ToArray();
+            var bytes = ((MemoryStream) value).ToArray();
             serializer.Serialize(writer, bytes);
         }
     }

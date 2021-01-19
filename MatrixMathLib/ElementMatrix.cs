@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using MatrixMathLib.Interfaces;
 
 namespace MatrixMathLib
 {
     [Serializable]
-    public class ElementMatrix
+    public class ElementMatrix : IMemorizable
     {
         public LinkedList<LinkedList<int>> Matrix;
 
@@ -64,6 +66,25 @@ namespace MatrixMathLib
             }
         }
 
+        public void GetMemoryStream(BinaryWriter stream, out Stream negativeNumbersStream)
+        {
+            negativeNumbersStream = new MemoryStream();
+            using var negativeStream = new BinaryWriter(negativeNumbersStream);
+
+            for (var i = 0; i < Rows; i++)
+            for (var j = 0; j < Columns; j++)
+                if (this[i, j] >= 0)
+                {
+                    stream.Write(this[i, j]);
+                }
+                else
+                {
+                    stream.Write(0);
+
+                    if (negativeNumbersStream != null) negativeStream.Write(this[i, j]);
+                }
+        }
+
         public void Remove(int row, int column)
         {
             var currentNode = Matrix.First;
@@ -116,18 +137,9 @@ namespace MatrixMathLib
         public int GetSum()
         {
             var sum = 0;
-            var currentRowNode = Matrix.First;
-            for (var i = 0; i <= Rows && currentRowNode != null; i++)
-            {
-                var currentColumnNode = currentRowNode.Value.First;
-                for (var j = 0; j <= Rows && currentColumnNode != null; j++)
-                {
-                    sum += currentColumnNode.Value;
-                    currentColumnNode = currentColumnNode.Next;
-                }
-
-                currentRowNode = currentRowNode.Next;
-            }
+            for (var i = 0; i < Rows; i++)
+            for (var j = 0; j < Columns; j++)
+                sum += this[i, j];
 
             return sum;
         }
@@ -135,18 +147,9 @@ namespace MatrixMathLib
         public int GetProduct()
         {
             var product = 1;
-            var currentRowNode = Matrix.First;
-            for (var i = 0; i <= Rows && currentRowNode != null; i++)
-            {
-                var currentColumnNode = currentRowNode.Value.First;
-                for (var j = 0; j <= Rows && currentColumnNode != null; j++)
-                {
-                    product *= currentColumnNode.Value;
-                    currentColumnNode = currentColumnNode.Next;
-                }
-
-                currentRowNode = currentRowNode.Next;
-            }
+            for (var i = 0; i < Rows; i++)
+            for (var j = 0; j < Columns; j++)
+                product *= this[i, j];
 
             return product;
         }

@@ -9,16 +9,17 @@ namespace MatrixMathLib
     [Serializable]
     public class ElementMatrix : IMemorizable
     {
-        public LinkedList<LinkedList<int>> Matrix;
+
+        private LinkedList<LinkedList<int>> _matrix;
 
         public ElementMatrix()
         {
-            Matrix = new LinkedList<LinkedList<int>>();
+            _matrix = new LinkedList<LinkedList<int>>();
         }
 
         public ElementMatrix(LinkedList<LinkedList<int>> matrix)
         {
-            Matrix = matrix;
+            _matrix = matrix;
 
             Rows = matrix.Count;
             if (matrix.Last != null) Columns = matrix.Last.Value.Count;
@@ -28,13 +29,13 @@ namespace MatrixMathLib
 
         public ElementMatrix(int rows, int columns)
         {
-            Matrix = new LinkedList<LinkedList<int>>();
+            _matrix = new LinkedList<LinkedList<int>>();
             for (var i = 0; i < rows; i++)
             {
                 var subMatrix = new LinkedList<int>();
 
                 for (var j = 0; j < columns; j++) subMatrix.AddLast(0);
-                Matrix.AddLast(subMatrix);
+                _matrix.AddLast(subMatrix);
             }
 
             Rows = rows;
@@ -46,10 +47,10 @@ namespace MatrixMathLib
 
         public int this[int row, int column]
         {
-            get => Matrix.ElementAt(row).ElementAt(column);
+            get => _matrix.ElementAt(row).ElementAt(column);
             set
             {
-                var currentNode = Matrix.First;
+                var currentNode = _matrix.First;
                 for (var i = 0; i <= row && currentNode != null; i++)
                 {
                     if (i != row)
@@ -68,6 +69,8 @@ namespace MatrixMathLib
 
         public void GetMemoryStream(BinaryWriter stream, out Stream negativeNumbersStream)
         {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+
             negativeNumbersStream = new MemoryStream();
             using var negativeStream = new BinaryWriter(negativeNumbersStream);
 
@@ -87,7 +90,7 @@ namespace MatrixMathLib
 
         public void Remove(int row, int column)
         {
-            var currentNode = Matrix.First;
+            var currentNode = _matrix.First;
             for (var i = 0; i <= row && currentNode != null; i++)
             {
                 if (i != row)
@@ -96,7 +99,7 @@ namespace MatrixMathLib
                     continue;
                 }
 
-                currentNode.Value.RemoveAt(column);
+                currentNode.Value.ChangeAt(column,0);
                 return;
             }
 
@@ -110,7 +113,7 @@ namespace MatrixMathLib
                 var subMatrix = new LinkedList<int>();
 
                 for (var j = 0; j < Columns; j++) subMatrix.AddLast(0);
-                Matrix.AddLast(subMatrix);
+                _matrix.AddLast(subMatrix);
             }
 
             Rows += rowsCount;
@@ -118,7 +121,7 @@ namespace MatrixMathLib
 
         public void AddColumns(int columnsCount)
         {
-            var currentNode = Matrix.First;
+            var currentNode = _matrix.First;
             for (var i = 0; i <= Rows && currentNode != null; i++)
             {
                 for (var j = 0; j < columnsCount; j++) currentNode.Value.AddLast(0);
@@ -127,11 +130,6 @@ namespace MatrixMathLib
             }
 
             Columns += columnsCount;
-        }
-
-        public LinkedList<LinkedList<int>> GetMatrix()
-        {
-            return Matrix;
         }
 
         public int GetSum()

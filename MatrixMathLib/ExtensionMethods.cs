@@ -6,7 +6,7 @@ namespace MatrixMathLib
 {
     public static class ExtensionMethods
     {
-        public static LinkedListNode<T> RemoveAt<T>(this LinkedList<T> list, int index)
+        internal static LinkedListNode<T> RemoveAt<T>(this LinkedList<T> list, int index)
         {
             var currentNode = list.First;
             for (var i = 0; i <= index && currentNode != null; i++)
@@ -24,7 +24,7 @@ namespace MatrixMathLib
             throw new IndexOutOfRangeException();
         }
 
-        public static LinkedListNode<T> ChangeAt<T>(this LinkedList<T> list, int index, T element)
+        internal static LinkedListNode<T> ChangeAt<T>(this LinkedList<T> list, int index, T element)
         {
             var currentNode = list.First;
             for (var i = 0; i <= index && currentNode != null; i++)
